@@ -18,7 +18,7 @@ Phase 0에서는 양쪽 빌드, Android 센서 일부, Windows 고정 궤적의 
 
 ## P0-E · 도구와 빌드 재현
 
-[README](../README.md)의 플랫폼별 명령을 독립적으로 실행한다. Android는 `sensor-diagnostics-debug.apk` 생성, 실행 Activity 등록 및 서명된 debug APK 여부를 확인한다. Windows는 빌드 후 생성된 exe를 `--diagnostics`로 실행하고 창 제목·장치 상태·대각선을 확인한다. 빌드, 창 실행, 장치 생성, 이벤트 수신은 각각 다른 결과 칸에 기록한다. 새 PC에서는 Gradle Wrapper의 JAR/배포판 해시, Android SDK 경로, dotnet SDK/런타임·Windows SDK·App Runtime x64 버전을 먼저 확인한다. [Gradle 공식 체크섬](https://gradle.org/release-checksums/)
+[개발 환경과 빌드](DEVELOPMENT.md)의 플랫폼별 명령을 독립적으로 실행한다. Android는 `sensor-diagnostics-debug.apk` 생성, 실행 Activity 등록 및 서명된 debug APK 여부를 확인한다. Windows는 빌드 후 생성된 exe를 `--diagnostics`로 실행하고 창 제목·장치 상태·대각선을 확인한다. 빌드, 창 실행, 장치 생성, 이벤트 수신은 각각 다른 결과 칸에 기록한다. 새 PC에서는 Gradle Wrapper의 JAR/배포판 해시, Android SDK 경로, dotnet SDK/런타임·Windows SDK·App Runtime x64 버전을 먼저 확인한다. [Gradle 공식 체크섬](https://gradle.org/release-checksums/)
 
 ## P0-S · Galaxy Tab S9 FE+와 실제 S펜 필요
 
