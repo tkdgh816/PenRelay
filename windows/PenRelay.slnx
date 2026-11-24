@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="Core/Core.csproj" />
+  <Project Path="PenFixture/PenFixture.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="PenRelay.Desktop/PenRelay.Desktop.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="SessionFixture/SessionFixture.csproj" />
+</Solution>

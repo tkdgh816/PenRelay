@@ -1,0 +1,160 @@
+<Window x:Class="PenRelay.Desktop.HostWindow"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:PenRelay.Desktop" xmlns:settings="using:CommunityToolkit.WinUI.Controls" xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml" Title="{x:Bind local:App.ProductName}">
+  <Window.SystemBackdrop><MicaBackdrop/></Window.SystemBackdrop>
+  <Grid x:Name="Shell">
+    <Grid.Resources>
+      <DataTemplate x:Key="ConnectionHeader"><TextBlock Text="{Binding}" FontWeight="Bold" Margin="0,0,0,4"/></DataTemplate>
+    </Grid.Resources>
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+    <TitleBar Height="48" x:Name="TitleDrag" Title="{x:Bind local:App.ProductName}" AutomationProperties.Name="펜 릴레이 제목 표시줄">
+      <TitleBar.IconSource><BitmapIconSource UriSource="ms-appx:///Assets/PenRelay.png" ShowAsMonochrome="False"/></TitleBar.IconSource>
+      <TitleBar.RightHeader>
+        <Button Style="{ThemeResource SubtleButtonStyle}" VerticalAlignment="Center"
+                Content="{x:Bind Model.Connection,Mode=OneWay}" ToolTipService.ToolTip="태블릿 연결 상세 정보" AutomationProperties.HelpText="태블릿 연결 상세 정보">
+          <Button.Flyout><Flyout Placement="BottomEdgeAlignedRight"><StackPanel Spacing="8" MaxWidth="380">
+                <TextBlock Text="태블릿 연결" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="{x:Bind Model.Route,Mode=OneWay}" TextWrapping="Wrap"/>
+                <TextBlock Text="{x:Bind Model.State,Mode=OneWay}" TextWrapping="Wrap"/>
+                <TextBlock Text="{x:Bind Model.Document,Mode=OneWay}" TextWrapping="Wrap"/>
+                <InfoBar x:Name="Issue" IsOpen="False" Severity="Error" Title="연결을 확인해 주세요" IsClosable="True">
+                  <InfoBar.Content><StackPanel Orientation="Horizontal" Spacing="8"><Button Content="다시 시도" Click="RetryHost"/><Button Content="연결 방식 변경" Click="Recover"/></StackPanel></InfoBar.Content>
+                </InfoBar>
+          </StackPanel></Flyout></Button.Flyout>
+        </Button>
+      </TitleBar.RightHeader>
+    </TitleBar>
+    <NavigationView Grid.Row="1" x:Name="Nav" AlwaysShowHeader="False" PaneDisplayMode="Auto" IsBackButtonVisible="Collapsed" IsSettingsVisible="False" SelectionChanged="Navigate" OpenPaneLength="198" PaneTitle="{x:Bind local:App.ProductName}">
+      <NavigationView.MenuItems>
+        <NavigationViewItem Content="대시보드" Tag="dashboard" Icon="Home" AccessKey="1"/>
+        <NavigationViewItem x:Name="CanvasItem" Content="캔버스" Tag="canvas" Icon="Pictures" AccessKey="2" ToolTipService.ToolTip="캔버스에 쓰기 · 태블릿의 필기를 PC에서 보기"/>
+        <NavigationViewItem x:Name="DigitizerItem" Content="디지타이저" Tag="digitizer" Icon="Edit" AccessKey="3" ToolTipService.ToolTip="PC에 펜 입력 · 선택한 모니터에서 필기"/>
+        <NavigationViewItem Content="설정" Tag="settings" Icon="Setting" AccessKey="4"/>
+        <NavigationViewItem Content="진단" Tag="diagnostics" Icon="Help" AccessKey="5"/>
+      </NavigationView.MenuItems>
+      <Grid x:Name="PageLayout" Padding="32,24,32,24">
+        <VisualStateManager.VisualStateGroups>
+          <VisualStateGroup>
+            <VisualState x:Name="CompactPage"><VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="0"/></VisualState.StateTriggers>
+              <VisualState.Setters><Setter Target="PageLayout.Padding" Value="24,16,24,18"/></VisualState.Setters>
+            </VisualState>
+            <VisualState x:Name="WidePage"><VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="880"/></VisualState.StateTriggers>
+              <VisualState.Setters><Setter Target="PageLayout.Padding" Value="32,24,32,24"/></VisualState.Setters>
+            </VisualState>
+          </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Frame x:Name="Pages" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsTabStop="False"/>
+        <Grid x:Name="PageStore" Visibility="Collapsed">
+          <ScrollViewer x:Name="Dashboard" HorizontalScrollMode="Disabled"><StackPanel Spacing="12" HorizontalAlignment="Stretch">
+              <Grid Padding="24,18" CornerRadius="16" ColumnSpacing="16">
+                <Grid.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#231F40" Offset="0"/><GradientStop Color="#463B87" Offset="1"/></LinearGradientBrush></Grid.Background>
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Galaxy Tab  /  Windows" Foreground="#CAC2FF" FontWeight="SemiBold"/>
+                  <TextBlock Text="{x:Bind local:App.ProductName}" Foreground="White" FontSize="34" FontWeight="Bold"/>
+                </StackPanel>
+                <Image Grid.Column="1" Width="64" Height="64" Source="ms-appx:///Assets/PenRelay.png"/>
+              </Grid>
+              <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Border Grid.ColumnSpan="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="12" Padding="16"><StackPanel Spacing="6">
+                    <FontIcon Glyph="&#xE7F4;" HorizontalAlignment="Left" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                    <TextBlock Text="대상 모니터" FontWeight="SemiBold" FontSize="18"/>
+                    <TextBlock Text="{x:Bind Model.Monitor,Mode=OneWay}" TextWrapping="Wrap"/>
+                </StackPanel></Border>
+              </Grid>
+              <Grid x:Name="Connections" ColumnSpacing="16" RowSpacing="8" SizeChanged="ConnectionsResized">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition x:Name="InviteColumn" Width="0"/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <StackPanel Spacing="8">
+                  <TextBlock Text="기기 연결" FontSize="22" FontWeight="SemiBold"/>
+                  <TextBlock x:Name="NextStep" Text="태블릿과 PC를 같은 Wi-Fi에 연결하세요. 아래에서 PC 주소와 S펜을 사용할 모니터를 선택한 뒤 ‘연결 대기 시작’을 누르세요." TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>
+                  <ComboBox x:Name="Route" Margin="0,10,0,4" HeaderTemplate="{StaticResource ConnectionHeader}" Header="연결 방식" AutomationProperties.AutomationId="Route" HorizontalAlignment="Stretch" SelectionChanged="RouteChanged"/>
+                  <TextBlock x:Name="RouteHelp" TextWrapping="Wrap"/>
+                  <StackPanel x:Name="DirectJoinPanel" Spacing="4" Visibility="Collapsed">
+                    <TextBlock Text="Wi-Fi Direct 연결 QR" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
+                    <canvas:CanvasControl x:Name="DirectQr" MaxWidth="224" Height="224" HorizontalAlignment="Stretch" ClearColor="White" Draw="DrawQr" AutomationProperties.Name="무선 그룹에 참여하기 위한 PC 연결 QR"/>
+                    <TextBlock x:Name="DirectCode" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+                  </StackPanel>
+                  <ComboBox x:Name="Address" Margin="0,10,0,4" HeaderTemplate="{StaticResource ConnectionHeader}" Header="PC 대기 주소" HorizontalAlignment="Stretch" SelectionChanged="SelectionEdited"/>
+                  <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                    <TextBox x:Name="SessionPortInput" Margin="0,10,0,4" HeaderTemplate="{StaticResource ConnectionHeader}" Header="세션 포트" InputScope="Number" MaxLength="5"/>
+                    <TextBox x:Name="PairingPortInput" Margin="0,10,0,4" HeaderTemplate="{StaticResource ConnectionHeader}" Grid.Column="1" Header="등록 포트" InputScope="Number" MaxLength="5"/>
+                  </Grid>
+                  <ComboBox x:Name="Target" Margin="0,10,0,4" HeaderTemplate="{StaticResource ConnectionHeader}" Header="펜 입력을 받을 모니터" HorizontalAlignment="Stretch" SelectionChanged="SelectionEdited"/>
+                  <InfoBar x:Name="ConnectionIssue" Severity="Error" Title="연결 대기를 시작할 수 없습니다" IsOpen="False" AutomationProperties.LiveSetting="Assertive"/>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="Start" Content="연결 대기 시작" Click="StartHost" Style="{ThemeResource AccentButtonStyle}"/>
+                    <Button x:Name="Stop" Content="연결 대기 중지" Click="StopHost" IsEnabled="False"/>
+                    <Button x:Name="Refresh" Content="목록 새로 고침" Click="RefreshLists"/>
+                  </StackPanel>
+                </StackPanel>
+                <StackPanel x:Name="InvitationPanel" Grid.Row="1" Spacing="8">
+                  <TextBlock Text="태블릿 등록" FontSize="22" FontWeight="SemiBold"/>
+                  <TextBlock Text="처음 연결하는 태블릿은 QR 코드로 초대하세요." TextWrapping="Wrap"/>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="Invite" Content="기기 초대" Click="InviteDevice" IsEnabled="False"/>
+                    <Button x:Name="Approve" Content="지문 확인 후 승인" Click="ApproveDevice" IsEnabled="False"/>
+                  </StackPanel>
+                  <canvas:CanvasControl x:Name="InviteQr" MaxWidth="320" Height="320" HorizontalAlignment="Stretch" ClearColor="White" Draw="DrawQr" Visibility="Collapsed" AutomationProperties.Name="태블릿으로 스캔할 일회용 등록 QR 코드"/>
+                  <TextBlock x:Name="Pairing" TextWrapping="Wrap" IsTextSelectionEnabled="True" AutomationProperties.LiveSetting="Polite"/>
+                  <TextBlock x:Name="Ready" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+                </StackPanel>
+              </Grid>
+          </StackPanel></ScrollViewer>
+          <ScrollViewer x:Name="Digitizer"><StackPanel Spacing="12">
+              <TextBlock x:Name="ScreenName" Style="{ThemeResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/>
+              <TextBlock Text="PC에 펜 입력 · 태블릿에서 ‘디지타이저’를 선택하고 검은 입력면에 S펜으로 쓰세요. 90° 회전, 비율 전환, 세 점 보정으로 위치를 맞출 수 있습니다." TextWrapping="Wrap"/>
+              <Button Content="대상 모니터 선택" Click="GoDashboard"/>
+              <ComboBox x:Name="Rotation" Header="시작 방향" SelectionChanged="MappingChanged"><x:String>0°</x:String><x:String>90°</x:String><x:String>180°</x:String><x:String>270°</x:String></ComboBox>
+              <CheckBox x:Name="Aspect" Content="시작할 때 종횡비 유지" Click="MappingEdited"/>
+              <CheckBox x:Name="Calibrate" Content="다음 호스트 시작 후 태블릿에서 세 점 보정"/>
+          </StackPanel></ScrollViewer>
+          <Grid x:Name="CanvasPage">
+            <local:CanvasWorkspace x:Name="Workspace"/>
+          </Grid>
+          <Grid x:Name="Settings">
+            <ScrollViewer MaxWidth="960" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+              <StackPanel Spacing="4">
+                <TextBlock Text="일반" Style="{ThemeResource BodyStrongTextBlockStyle}" Margin="0,4"/>
+                <settings:SettingsCard Header="테마" HeaderIcon="FontColor">
+                  <ComboBox x:Name="ThemeChoice" AutomationProperties.Name="테마" SelectionChanged="ThemeChanged">
+                    <x:String>시스템 설정</x:String><x:String>밝게</x:String><x:String>어둡게</x:String>
+                  </ComboBox>
+                </settings:SettingsCard>
+                <settings:SettingsCard Header="메인 창을 닫을 때" HeaderIcon="BackToWindow">
+                  <ComboBox x:Name="CloseChoice" AutomationProperties.Name="메인 창을 닫을 때" SelectionChanged="CloseChoiceChanged">
+                    <x:String>알림 영역(트레이)으로 숨기기</x:String><x:String>앱 종료</x:String>
+                  </ComboBox>
+                </settings:SettingsCard>
+                <settings:SettingsCard x:Name="MinimizeCard" Header="메인 창을 최소화할 때" HeaderIcon="Remove" Visibility="Collapsed">
+                  <ComboBox x:Name="MinimizeChoice" AutomationProperties.Name="메인 창을 최소화할 때" SelectionChanged="MinimizeChoiceChanged">
+                    <x:String>작업 표시줄로 최소화</x:String><x:String>알림 영역(트레이)으로 숨기기</x:String>
+                  </ComboBox>
+                </settings:SettingsCard>
+                <TextBlock Text="기기 연결" Style="{ThemeResource BodyStrongTextBlockStyle}" Margin="0,20,0,4"/>
+                <settings:SettingsCard Header="연결 방식 및 PC 주소" HeaderIcon="Link" IsClickEnabled="True" Click="GoDashboard"/>
+                <settings:SettingsCard Header="ADB 실행 파일" HeaderIcon="OpenFile">
+                  <settings:SettingsCard.Description><TextBlock x:Name="AdbLocation" TextWrapping="Wrap" IsTextSelectionEnabled="True"/></settings:SettingsCard.Description>
+                  <Button Content="파일 선택" Click="ChooseAdb"/>
+                </settings:SettingsCard>
+                <settings:SettingsCard Header="등록된 기기 지문" HeaderIcon="Permissions">
+                  <StackPanel Spacing="8">
+                    <ComboBox x:Name="Devices" Width="280" PlaceholderText="등록된 기기 없음" AutomationProperties.Name="등록된 기기 지문" SelectionChanged="DeviceSelected"/>
+                    <TextBlock x:Name="DeviceError" MaxWidth="280" TextWrapping="Wrap" Visibility="Collapsed" AutomationProperties.LiveSetting="Polite"/>
+                    <Button x:Name="Revoke" Content="선택한 기기 등록 해제" Click="RevokeDevice" IsEnabled="False"/>
+                  </StackPanel>
+                </settings:SettingsCard>
+              </StackPanel>
+            </ScrollViewer>
+          </Grid>
+          <ScrollViewer x:Name="Diagnostics"><StackPanel Spacing="12">
+              <TextBlock Text="{x:Bind Model.Diagnostic,Mode=OneWay}" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+              <TextBlock x:Name="History" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+          </StackPanel></ScrollViewer>
+        </Grid>
+      </Grid>
+    </NavigationView>
+  </Grid>
+</Window>

@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Product>Pen Relay</Product>
+    <AssemblyTitle>Pen Relay</AssemblyTitle>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/PenRelay.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Assets\PenRelay.png;Assets\PenRelay.ico"/>
+    <Content Include="Assets\PenRelay.png;Assets\PenRelay.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
+    <ProjectReference Include="../SessionFixture/SessionFixture.csproj" />
+    <Compile Include="..\PenFixture\PenData.cs" Link="PenData.cs" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.7.0" />
+    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.1" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+    <PackageReference Include="QRCoder" Version="1.7.0" />
+  </ItemGroup>
+  <Target Name="PublishCompiledXaml" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <CompiledView Include="$(TargetDir)*.xbf;$(TargetDir)$(AssemblyName).pri" />
+      <ResolvedFileToPublish Include="@(CompiledView)" RelativePath="%(CompiledView.Filename)%(CompiledView.Extension)" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+    <Error Condition="!Exists('$(TargetDir)HostWindow.xbf') Or !Exists('$(TargetDir)$(AssemblyName).pri')" Text="제품 XAML 또는 PRI 빌드 결과가 없습니다." />
+  </Target>
+</Project>

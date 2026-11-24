@@ -1,0 +1,32 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="펜 릴레이" Manufacturer="Pen Relay" Version="$(var.ProductVersion)"
+           Language="1042" UpgradeCode="B4A365D4-9783-4C43-9B9F-6D4ACC407077" Scope="perUser">
+    <MajorUpgrade DowngradeErrorMessage="더 최신 버전이 이미 설치되어 있습니다." Schedule="afterInstallInitialize"/>
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high"/>
+    <Property Id="HOSTBUILD">
+      <RegistrySearch Id="ReadWindowsBuild" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+                      Name="CurrentBuildNumber" Type="raw" Bitness="always64"/>
+    </Property>
+    <Launch Condition="Installed OR (VersionNT64 AND HOSTBUILD &gt;= 22000)" Message="Windows 11 x64 이상이 필요합니다."/>
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="ProgramsDir" Name="Programs">
+        <Directory Id="INSTALLDIR" Name="Pen Relay"/>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="MenuEntry" Guid="91BAEFFC-B23E-4AD4-BA5C-6963E46DEC7C">
+        <Shortcut Id="LaunchHost" Name="펜 릴레이" Target="[INSTALLDIR]PenRelay.Desktop.exe" WorkingDirectory="INSTALLDIR"/>
+        <RegistryValue Root="HKCU" Key="Software\PenRelay\Installer" Name="StartMenu" Value="1" Type="integer" KeyPath="yes"/>
+      </Component>
+    </StandardDirectory>
+    <Feature Id="Main">
+      <ComponentRef Id="MenuEntry"/>
+      <ComponentGroupRef Id="Payload"/>
+    </Feature>
+  </Package>
+  <Fragment>
+    <ComponentGroup Id="Payload" Directory="INSTALLDIR">
+      <Files Include="$(var.Payload)\**"/>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -1,0 +1,12 @@
+<Window x:Class="PenRelay.Desktop.DeviceDiagnosticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+        Title="펜 릴레이 · 펜 장치 진단">
+  <StackPanel Padding="24" Spacing="12">
+    <TextBlock Text="Windows 호환성 검사" Style="{ThemeResource TitleTextBlockStyle}" />
+    <TextBlock Text="{x:Bind ViewModel.DeviceStatus}" TextWrapping="Wrap"/>
+    <TextBlock Text="Win2D가 동작하면 아래에 파란 대각선이 표시됩니다." TextWrapping="Wrap"/>
+    <canvas:CanvasControl Height="120" Draw="DrawSample" />
+  </StackPanel>
+</Window>

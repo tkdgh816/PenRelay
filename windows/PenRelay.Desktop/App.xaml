@@ -1,0 +1,50 @@
+<Application x:Class="PenRelay.Desktop.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
+      </ResourceDictionary.MergedDictionaries>
+      <x:Double x:Key="FilmstripTileHeight">80</x:Double>
+      <CornerRadius x:Key="FilmstripCornerRadius">9</CornerRadius>
+      <DataTemplate x:Key="NoteCardContent">
+        <Grid Margin="2" CornerRadius="7" Background="{ThemeResource AccentFillColorTertiaryBrush}">
+          <Path Stretch="Fill" VerticalAlignment="Bottom" Height="58" Data="M0,0 L39,0 C46,0 49,8 56,8 L96,8 L96,58 L0,58 Z" Fill="{ThemeResource SolidBackgroundFillColorSecondaryBrush}"/>
+          <StackPanel Margin="8,0,6,4" VerticalAlignment="Bottom">
+            <TextBlock x:Name="NoteCount" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            <TextBlock x:Name="NoteTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+          </StackPanel>
+        </Grid>
+      </DataTemplate>
+      <Style x:Key="FilmstripRailStyle" TargetType="ScrollViewer" BasedOn="{StaticResource DefaultScrollViewerStyle}">
+        <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}"/>
+      </Style>
+      <Style x:Key="FilmstripThumbnailStyle" TargetType="ToggleButton">
+        <Setter Property="Width" Value="96"/>
+        <Setter Property="Height" Value="{StaticResource FilmstripTileHeight}"/>
+        <Setter Property="UseSystemFocusVisuals" Value="True"/>
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="ToggleButton">
+              <Grid Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="{StaticResource FilmstripCornerRadius}">
+                <VisualStateManager.VisualStateGroups>
+                  <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"/>
+                    <VisualState x:Name="PointerOver"><VisualState.Setters><Setter Target="Outline.BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}"/></VisualState.Setters></VisualState>
+                    <VisualState x:Name="Pressed"><VisualState.Setters><Setter Target="Preview.Opacity" Value="0.8"/></VisualState.Setters></VisualState>
+                    <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Outline.BorderBrush" Value="{ThemeResource AccentTextFillColorPrimaryBrush}"/></VisualState.Setters></VisualState>
+                    <VisualState x:Name="CheckedPointerOver"><VisualState.Setters><Setter Target="Outline.BorderBrush" Value="{ThemeResource AccentTextFillColorPrimaryBrush}"/></VisualState.Setters></VisualState>
+                    <VisualState x:Name="CheckedPressed"><VisualState.Setters><Setter Target="Outline.BorderBrush" Value="{ThemeResource AccentTextFillColorPrimaryBrush}"/><Setter Target="Preview.Opacity" Value="0.8"/></VisualState.Setters></VisualState>
+                  </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+                <ContentPresenter x:Name="Preview" Content="{TemplateBinding Content}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <Border x:Name="Outline" BorderThickness="2" CornerRadius="{StaticResource FilmstripCornerRadius}" IsHitTestVisible="False"/>
+              </Grid>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

@@ -1,0 +1,4 @@
+<UserControl x:Class="PenRelay.Desktop.CanvasViewer" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:win2d="using:Microsoft.Graphics.Canvas.UI.Xaml">
+  <win2d:CanvasControl x:Name="Paper" ClearColor="#E6E5E9" CreateResources="ResourcesCreated" Draw="Draw" AutomationProperties.Name="태블릿 캔버스 읽기 전용"/>
+</UserControl>

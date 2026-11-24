@@ -1,0 +1,19 @@
+# Local SDKs, IDE files and build outputs
+.local/
+artifacts/
+.vs/
+.idea/
+.gradle/
+.kotlin/
+__pycache__/
+local.properties
+**/build/
+**/bin/
+**/obj/
+*.user
+*.keystore
+*.jks
+*.pfx
+*.pem
+tests/
+*.code-workspace

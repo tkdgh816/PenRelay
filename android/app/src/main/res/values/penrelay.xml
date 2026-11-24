@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Pen Relay</string>
+    <color name="penrelay_icon_background">#4B429F</color>
+    <style name="PenRelayTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:colorAccent">#5043BB</item>
+        <item name="android:windowBackground">#F8F7FB</item>
+        <item name="android:navigationBarColor">#00000000</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:statusBarColor">#00000000</item>
+    </style>
+</resources>
